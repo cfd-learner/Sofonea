@@ -83,7 +83,18 @@ int main(int argc, char *argv[])
 		computeEqDistribution(feq, W, density, macroVelocityX, macroVelocityY, basisVx, basisVy,  xCount, yCount);
 		computeSingleStepScheme(fin, F, feq, xCount, yCount, omegaCoeff, timeStep, xStep, basisVx, basisVy);
 
-
+		ApproximationForBGK_onTheUpperBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			   omegaCoeff, timeStep, xStep, yStep, yCount - 1, xCount);  //
+		 setZouHeBoundaryCondRight(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		 ApproximationForBGK_onTheLowerBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			 omegaCoeff, timeStep, xStep, yStep, 0, xCount);   //
+		 setZouHeBoundaryCondLeft(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		 ApproximationForBGK_onTheLeftBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			 omegaCoeff, timeStep, xStep, yStep, 0, yCount); //
+		 setZouHeBoundaryCondLower(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		 ApproximationForBGK_onTheRightBoundary(fin, F,feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			 omegaCoeff, timeStep, xStep, yStep, xCount - 1, yCount); //
+		 setZouHeBoundaryCondUp(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
 	}
 
 
