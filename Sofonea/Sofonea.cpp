@@ -13,11 +13,12 @@
 #include "Array.h"
 #include "Density.h"
 #include "Distribution.h"
+#include "Macrovelocity.h"
+#include "Scheme.h"
 
 #define BASIS 9
 
 using namespace std;
-
 
 
 
@@ -39,66 +40,6 @@ int* setLatticeVelocityY()
 	v_y[3] = 0; v_y[4] = -1; v_y[5] = 1;
 	v_y[6] = 1; v_y[7] = -1; v_y[8] = -1;
 	return v_y;
-}
-
-
-
-double** setInitialMacroVelocity(int xNum, int yNum)
-{
-	double** vel = createLayer(xNum, yNum);
-	for (int i = 0; i < xNum; i++)
-		for (int j = 0; j < yNum; j++)
-			vel[i][j] = 0;
-	return vel;
-}
-
-
-void computeMacroVelocity(double** Ux, double** Uy, double** den, double*** f, int xNum, int yNum)
-{
-	 for (int i = 1; i < xNum - 1; i++)
-           for (int j = 1 ; j < yNum - 1; j++)
-		   {
-			   Ux[i][j] = (f[1][i][j] + f[5][i][j] + f[8][i][j] 
-			         - f[3][i][j] - f[6][i][j] - f[7][i][j]) / den[i][j];
-               Uy[i][j] = (f[2][i][j] + f[5][i][j] + f[6][i][j] 
-			         - f[4][i][j] - f[7][i][j] - f[8][i][j]) / den[i][j];
-		   }
-
-}
-
-void setBoundaryCondMacroVelocity(double** Ux, double** Uy, double U0, int xNum, int yNum)
-{
-       
-        for (int i = 0; i < xNum; i++)
-       {
-		   //Upper boundary
-           Ux[i][yNum - 1] = U0;
-           Uy[i][yNum - 1] = 0;
-		   //lower boundary
-		   Ux[i][0] = 0;
-           Uy[i][0] = 0;
-	   }
-       
-       for (int j = 0; j < yNum; j++)
-       {
-		   //left boundary
-           Ux[0][j] = 0;
-           Uy[0][j] = 0;
-		   //right boundary
-		   Ux[xNum - 1][j] = 0;
-           Uy[xNum - 1][j] = 0;
-	   }
-           	   
-}
-
-
-void computeSingleStepScheme(double*** fin, double*** F, double*** feq, int xNum, int yNum, double omega, double tau, double hx, int* v_x, int* v_y)
-{
-     for (int p = 0;p < BASIS; p++)
-           for (int i = 1;i < xNum - 1; i++)
-               for (int k = 1;k < yNum - 1; k++)
-			       fin[p][i][k] = F[p][i][k]-(omega) *(F[p][i][k] - feq[p][i][k])
-				       - tau / hx * (F[p][i][k] - F[p][i - v_x[p]][k - v_y[p]]);
 }
 
 
