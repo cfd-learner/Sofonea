@@ -1,0 +1,21 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+
+
+*.opensdf
+*.sln
+*.sdf
+Sofonea/Sofonea.vcxproj.filters
+Sofonea/Sofonea.vcxproj
+Sofonea/Debug
