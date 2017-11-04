@@ -3,6 +3,7 @@
 //Scheme is based on divergent form of Boltzmann equation. 
 //Modelling of the flow in rectangular cavern.
 //Programmed by Gerasim Krivovichev
+//Modified by Maria Maschinskaya
 
 #include <cstdlib>
 #include <iostream>
