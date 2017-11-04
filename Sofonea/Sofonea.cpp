@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	for (int q = 0; q < 2; q++)
 	{
 		Copy(F, fin, xCount, yCount);
-	    Copy(fin1, fin, xCount, yCount);
+		Copy(fin1, fin, xCount, yCount);
 		computeDensity(density, fin, xCount, yCount);
 		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
 		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
@@ -84,19 +84,66 @@ int main(int argc, char *argv[])
 		computeSingleStepScheme(fin, F, feq, xCount, yCount, omegaCoeff, timeStep, xStep, basisVx, basisVy);
 
 		ApproximationForBGK_onTheUpperBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
-			   omegaCoeff, timeStep, xStep, yStep, yCount - 1, xCount);  //
-		 setZouHeBoundaryCondRight(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
-		 ApproximationForBGK_onTheLowerBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
-			 omegaCoeff, timeStep, xStep, yStep, 0, xCount);   //
-		 setZouHeBoundaryCondLeft(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
-		 ApproximationForBGK_onTheLeftBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
-			 omegaCoeff, timeStep, xStep, yStep, 0, yCount); //
-		 setZouHeBoundaryCondLower(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
-		 ApproximationForBGK_onTheRightBoundary(fin, F,feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
-			 omegaCoeff, timeStep, xStep, yStep, xCount - 1, yCount); //
-		 setZouHeBoundaryCondUp(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+			omegaCoeff, timeStep, xStep, yStep, yCount - 1, xCount);  //
+		setZouHeBoundaryCondRight(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		ApproximationForBGK_onTheLowerBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, 0, xCount);   //
+		setZouHeBoundaryCondLeft(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		ApproximationForBGK_onTheLeftBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, 0, yCount); //
+		setZouHeBoundaryCondLower(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		ApproximationForBGK_onTheRightBoundary(fin, F,feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, xCount - 1, yCount); //
+		setZouHeBoundaryCondUp(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
 	}
 
+	// MAIN COMPUTATIONAL CYCLE
+	for (int time = 0; time < timeCount; time++)
+	{
+		Copy(F, fin, xCount, yCount);
+		computeDensity(density, fin, xCount, yCount);
+		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
+		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+		setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+		computeEqDistribution(feq, W, density, macroVelocityX, macroVelocityY, basisVx, basisVy,
+			xCount, yCount);
+
+		// PREDICTOR
+		computePredictor(fin, fin1, F, feq, basisVx, basisVy,
+			timeStep, xStep, yStep, omegaCoeff,
+			xCount, yCount);
+
+		ApproximationForBGK_onTheUpperBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, yCount - 1, xCount);
+		setZouHeBoundaryCondRight(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		ApproximationForBGK_onTheLowerBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, 0, xCount);
+		setZouHeBoundaryCondLeft(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		ApproximationForBGK_onTheLeftBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, 0, yCount);
+		setZouHeBoundaryCondLower(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+		ApproximationForBGK_onTheRightBoundary(fin, F, feq, density, basisVx, basisVy, macroVelocityX, macroVelocityY,
+			omegaCoeff, timeStep, xStep, yStep, xCount - 1, yCount);
+		setZouHeBoundaryCondUp(fin, density, macroVelocityX, macroVelocityY, xCount, yCount);
+
+
+		// CORRECTOR
+		computeDensity(density, fin, xCount, yCount);
+		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
+		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+		setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+		computeEqDistribution(feq, W, density, macroVelocityX, macroVelocityY, basisVx, basisVy, xCount, yCount);
+		computeCorrector(fin, fin1, feq, basisVx, basisVy, timeStep, xStep, yStep, omegaCoeff, xCount, yCount);
+		computeAverageLayer(fin1, fin, xCount, yCount);
+
+		cout << "time = " << time << endl;
+	}
+
+
+	computeDensity(density, fin, xCount, yCount);
+	computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
+	setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+	setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
 
 	// очищение памяти
 	delete[] W;
