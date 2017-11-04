@@ -8,6 +8,7 @@
 #include <iostream>
 #include <math.h>
 #include <conio.h>
+#include <string.h>
 
 #define BASIS 9
 
@@ -86,6 +87,45 @@ void freeMemory(double** arr, int xNum, int yNum)
 }
 
 
+double** setInitialDensity(int xNum, int yNum)
+{
+	double** den = createLayer(xNum, yNum);
+	for (int i = 0; i < xNum; i++)
+		for (int j = 0; j < yNum; j++)
+			den[i][j] = 1;
+	return den;
+}
+
+double** setInitialMacroVelocity(int xNum, int yNum)
+{
+	double** vel = createLayer(xNum, yNum);
+	for (int i = 0; i < xNum; i++)
+		for (int j = 0; j < yNum; j++)
+			vel[i][j] = 0;
+	return vel;
+}
+
+void calculateEqDistribution(double ***feq, double *W, double **rho, double **Ux, double**Uy, int *v_x, int *v_y, int xNum, int yNum)
+{
+     double Sp;
+       //variable for scalar production of lattice vector on macrospic velocity vector      
+     for (int k = 0; k < BASIS; k++)
+        for(int i = 0; i < xNum; i++)
+              for(int j = 0; j < yNum; j++)
+                {
+                    Sp = v_x[k] * Ux[i][j] + v_y[k] * Uy[i][j];            
+                    feq[k][i][j]=W[k] * rho[i][j] * (1 + 3 *Sp + 4.5 * Sp * Sp - 1.5 * (Ux[i][j] * Ux[i][j] + Uy[i][j] * Uy[i][j]));              
+                }           
+}
+
+void Copy(double*** dest, double*** source, int xNum, int yNum)
+{
+	 for(int i = 0;i < BASIS; i++)
+       for(int j = 0; j < xNum; j++)
+		   for(int k = 0; k < yNum; k++)
+             dest[i][j][k] = source[i][j][k];
+	   
+}
 
 int main(int argc, char *argv[])
 {
@@ -127,11 +167,18 @@ int main(int argc, char *argv[])
 	double*** feq1 = createDistributionFunction(xCount, yCount);
 
 	// macrocharacteristics
-	double** density = createLayer(xCount, yCount);
-	double** macroVelocityX = createLayer(xCount, yCount);
-	double** macroVelocityY = createLayer(xCount, yCount);
+	double** density = setInitialDensity(xCount, yCount);
+	double** macroVelocityX = setInitialMacroVelocity(xCount, yCount);
+	double** macroVelocityY = setInitialMacroVelocity(xCount, yCount);
 
+	calculateEqDistribution(fin, W, density,
+		macroVelocityX, macroVelocityY, basisVx, basisVy, xCount, yCount);
+	//memcpy(F, fin, (sizeof(double) * BASIS * xCount * yCount));
+	//memcpy(fin1, fin, (sizeof(double) * BASIS * xCount * yCount));
+	Copy(F, fin, xCount, yCount);
+	Copy(fin1, fin, xCount, yCount);
 
+	cout << fin1[7][10][90] << endl;
 
 
 	// очищение памяти
