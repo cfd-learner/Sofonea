@@ -105,7 +105,7 @@ double** setInitialMacroVelocity(int xNum, int yNum)
 	return vel;
 }
 
-void calculateEqDistribution(double ***feq, double *W, double **rho, double **Ux, double**Uy, int *v_x, int *v_y, int xNum, int yNum)
+void computeEqDistribution(double ***feq, double *W, double **rho, double **Ux, double**Uy, int *v_x, int *v_y, int xNum, int yNum)
 {
      double Sp;
        //variable for scalar production of lattice vector on macrospic velocity vector      
@@ -120,12 +120,86 @@ void calculateEqDistribution(double ***feq, double *W, double **rho, double **Ux
 
 void Copy(double*** dest, double*** source, int xNum, int yNum)
 {
-	 for(int i = 0;i < BASIS; i++)
+	 for(int i = 0; i < BASIS; i++)
        for(int j = 0; j < xNum; j++)
 		   for(int k = 0; k < yNum; k++)
              dest[i][j][k] = source[i][j][k];
 	   
 }
+
+void computeDensity(double** den, double*** f, int xNum, int yNum)
+{
+	 for (int i = 1; i < xNum - 1; i++)
+           for (int j = 1 ; j < yNum - 1; j++)
+               den[i][j] = f[0][i][j] + f[1][i][j] + f[2][i][j]
+		             + f[3][i][j] + f[4][i][j] + f[5][i][j]
+					 + f[6][i][j] + f[7][i][j] + f[8][i][j];
+
+}
+
+void computeMacroVelocity(double** Ux, double** Uy, double** den, double*** f, int xNum, int yNum)
+{
+	 for (int i = 1; i < xNum - 1; i++)
+           for (int j = 1 ; j < yNum - 1; j++)
+		   {
+			   Ux[i][j] = (f[1][i][j] + f[5][i][j] + f[8][i][j] 
+			         - f[3][i][j] - f[6][i][j] - f[7][i][j]) / den[i][j];
+               Uy[i][j] = (f[2][i][j] + f[5][i][j] + f[6][i][j] 
+			         - f[4][i][j] - f[7][i][j] - f[8][i][j]) / den[i][j];
+		   }
+
+}
+
+void setBoundaryCondMacroVelocity(double** Ux, double** Uy, double U0, int xNum, int yNum)
+{
+       
+        for (int i = 0; i < xNum; i++)
+       {
+		   //Upper boundary
+           Ux[i][yNum - 1] = U0;
+           Uy[i][yNum - 1] = 0;
+		   //lower boundary
+		   Ux[i][0] = 0;
+           Uy[i][0] = 0;
+	   }
+       
+       for (int j = 0; j < yNum; j++)
+       {
+		   //left boundary
+           Ux[0][j] = 0;
+           Uy[0][j] = 0;
+		   //right boundary
+		   Ux[xNum - 1][j] = 0;
+           Uy[xNum - 1][j] = 0;
+	   }
+           	   
+}
+
+void setBoundaryConditionsForRho(double ***fin,  double **rho, double **Ux, double**Uy, double U0, int xNum, int yNum)
+{   
+	  for (int i = 0; i < xNum; i++)
+       {
+		   // lower
+           rho[i][0] =(fin[0][i][0] + fin[1][i][0] + fin[3][i][0] +
+			   2.0 * (fin[4][i][0] + fin[7][i][0] + fin[8][i][0])) / (1.0 - Uy[i][0]);
+		   // upper
+           rho[i][yNum - 1] = (fin[0][i][yNum - 1] + fin[1][i][yNum - 1] + fin[3][i][yNum - 1]+ 
+			   2.0 * (fin[4][i][yNum - 1] + fin[7][i][yNum - 1] + fin[8][i][yNum - 1])) / (1.0 + Uy[i][yNum - 1]);
+	   }
+
+       for (int j = 0; j < yNum; j++)
+       {
+		    //right
+		    rho[xNum - 1][j] = (fin[0][xNum - 1][j] + fin[2][xNum - 1][j] + fin[4][xNum - 1][j]
+			    + 2.0 * (fin[1][xNum - 1][j] + fin[5][xNum - 1][j] + fin[8][xNum - 1][j])) / (1.0+Ux[xNum - 1][j]);
+            // left
+            rho[0][j]=(fin[0][0][j] + fin[2][0][j] + fin[4][0][j]
+			    + 2.0 * (fin[3][0][j] + fin[6][0][j] + fin[7][0][j])) / (1.0-Ux[0][j]);
+	   
+	   }
+}
+
+
 
 int main(int argc, char *argv[])
 {
@@ -171,14 +245,26 @@ int main(int argc, char *argv[])
 	double** macroVelocityX = setInitialMacroVelocity(xCount, yCount);
 	double** macroVelocityY = setInitialMacroVelocity(xCount, yCount);
 
-	calculateEqDistribution(fin, W, density,
+	computeEqDistribution(fin, W, density,
 		macroVelocityX, macroVelocityY, basisVx, basisVy, xCount, yCount);
 	//memcpy(F, fin, (sizeof(double) * BASIS * xCount * yCount));
 	//memcpy(fin1, fin, (sizeof(double) * BASIS * xCount * yCount));
 	Copy(F, fin, xCount, yCount);
 	Copy(fin1, fin, xCount, yCount);
 
-	cout << fin1[7][10][90] << endl;
+
+	// разгон
+	for (int p = 0; p < 2; p++)
+	{
+		Copy(F, fin, xCount, yCount);
+	    Copy(fin1, fin, xCount, yCount);
+		computeDensity(density, fin, xCount, yCount);
+		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
+		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+
+
+
+	}
 
 
 	// очищение памяти
