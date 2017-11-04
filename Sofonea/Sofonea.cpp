@@ -175,7 +175,7 @@ void setBoundaryCondMacroVelocity(double** Ux, double** Uy, double U0, int xNum,
            	   
 }
 
-void setBoundaryConditionsForRho(double ***fin,  double **rho, double **Ux, double**Uy, double U0, int xNum, int yNum)
+void setBoundaryCondDensity(double ***fin,  double **rho, double **Ux, double**Uy, double U0, int xNum, int yNum)
 {   
 	  for (int i = 0; i < xNum; i++)
        {
@@ -199,6 +199,14 @@ void setBoundaryConditionsForRho(double ***fin,  double **rho, double **Ux, doub
 	   }
 }
 
+void computeSingleStepScheme(double*** fin, double*** F, double*** feq, int xNum, int yNum, double omega, double tau, double hx, int* v_x, int* v_y)
+{
+     for (int p = 0;p < BASIS; p++)
+           for (int i = 1;i < xNum - 1; i++)
+               for (int k = 1;k < yNum - 1; k++)
+			       fin[p][i][k] = F[p][i][k]-(omega) *(F[p][i][k] - feq[p][i][k])
+				       - tau / hx * (F[p][i][k] - F[p][i - v_x[p]][k - v_y[p]]);
+}
 
 
 int main(int argc, char *argv[])
@@ -254,13 +262,15 @@ int main(int argc, char *argv[])
 
 
 	// разгон
-	for (int p = 0; p < 2; p++)
+	for (int q = 0; q < 2; q++)
 	{
 		Copy(F, fin, xCount, yCount);
 	    Copy(fin1, fin, xCount, yCount);
 		computeDensity(density, fin, xCount, yCount);
 		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
 		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+		setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+		computeEqDistribution(feq, W, density, macroVelocityX, macroVelocityY, basisVx, basisVy,  xCount, yCount);
 
 
 
