@@ -1,6 +1,6 @@
 #include "Array.h"
 
-#define BASIS 9
+
 double*** createDistributionFunction(int xNum, int yNum)
 {
 	double*** f = new double**[BASIS];
