@@ -1,4 +1,4 @@
-#include "Array.h"
+#include "Density.h"
 
 double** setInitialDensity(int xNum, int yNum)
 {

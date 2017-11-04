@@ -1,3 +1,4 @@
+#include "Array.h"
 double** setInitialDensity(int xNum, int yNum);
 void computeDensity(double** den, double*** f, int xNum, int yNum);
 void setBoundaryCondDensity(double ***fin,  double **rho,

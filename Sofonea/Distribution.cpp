@@ -1,4 +1,5 @@
-#define BASIS 9
+#include "Distribution.h"
+
 double* setConstantsForEquilibriumFunction()
 {
 	double *W = new double[BASIS];

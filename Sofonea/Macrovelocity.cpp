@@ -1,5 +1,4 @@
 #include "Macrovelocity.h"
-#include "Array.h"
 
 double** setInitialMacroVelocity(int xNum, int yNum)
 {
