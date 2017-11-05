@@ -2,7 +2,7 @@
 
 double** setInitialMacroVelocity(int xNum, int yNum)
 {
-	double** vel = createLayer(xNum, yNum);
+	double** vel = createArray(xNum, yNum);
 	for (int i = 0; i < xNum; i++)
 		for (int j = 0; j < yNum; j++)
 			vel[i][j] = 0;

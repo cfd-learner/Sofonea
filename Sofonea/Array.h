@@ -1,7 +1,6 @@
-#include "Latticevelocity.h"
 
-double*** createDistributionFunction(int xNum, int yNum);
-double** createLayer(int xNum, int yNum);
-void freeMemory(double*** arr, int xNum, int yNum);
-void freeMemory(double** arr, int xNum, int yNum);
-void Copy(double*** dest, double*** source, int xNum, int yNum);
+double*** createArray(int basisNum, int xNum, int yNum);
+double** createArray(int xNum, int yNum);
+void freeMemory(double*** arr, int basisNum, int xNum);
+void freeMemory(double** arr, int xNum);
+void Copy(double*** dest, double*** source, int basisNum, int xNum, int yNum);

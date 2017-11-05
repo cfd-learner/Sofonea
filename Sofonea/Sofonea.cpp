@@ -23,7 +23,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 	//что-то вынести в константы
-	int xCount = 150, yCount = 150, timeCount = 800000;
+	int xCount = 150, yCount = 150, timeCount = 8;
 	double timeLength = 400;
 	double xStep, yStep, timeStep;
 	double meanFreeTime, meanFreePath;
@@ -53,11 +53,11 @@ int main(int argc, char *argv[])
 	int *basisVy = setLatticeVelocityY();
 
 	// massives for distribution function
-	double*** fin = createDistributionFunction(xCount, yCount);
-	double*** fin1 = createDistributionFunction(xCount, yCount);
-	double*** F = createDistributionFunction(xCount, yCount);
-	double*** feq = createDistributionFunction(xCount, yCount);
-	double*** feq1 = createDistributionFunction(xCount, yCount);
+	double*** fin = createArray(BASIS, xCount, yCount);
+	double*** fin1 = createArray(BASIS, xCount, yCount);
+	double*** F = createArray(BASIS, xCount, yCount);
+	double*** feq = createArray(BASIS, xCount, yCount);
+	double*** feq1 = createArray(BASIS, xCount, yCount);
 
 	// macrocharacteristics
 	double** density = setInitialDensity(xCount, yCount);
@@ -68,15 +68,15 @@ int main(int argc, char *argv[])
 		macroVelocityX, macroVelocityY, basisVx, basisVy, xCount, yCount);
 	//memcpy(F, fin, (sizeof(double) * BASIS * xCount * yCount));
 	//memcpy(fin1, fin, (sizeof(double) * BASIS * xCount * yCount));
-	Copy(F, fin, xCount, yCount);
-	Copy(fin1, fin, xCount, yCount);
+	Copy(F, fin, BASIS, xCount, yCount);
+	Copy(fin1, fin,  BASIS, xCount, yCount);
 
 
 	// разгон
 	for (int q = 0; q < 2; q++)
 	{
-		Copy(F, fin, xCount, yCount);
-		Copy(fin1, fin, xCount, yCount);
+		Copy(F, fin, BASIS, xCount, yCount);
+		Copy(fin1, fin, BASIS, xCount, yCount);
 		computeDensity(density, fin, xCount, yCount);
 		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
 		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 	// MAIN COMPUTATIONAL CYCLE
 	for (int time = 0; time < timeCount; time++)
 	{
-		Copy(F, fin, xCount, yCount);
+		Copy(F, fin,  BASIS, xCount, yCount);
 		computeDensity(density, fin, xCount, yCount);
 		computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
 		setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
@@ -150,14 +150,14 @@ int main(int argc, char *argv[])
 	delete[] W;
 	delete[] basisVx;
 	delete[] basisVy;
-	freeMemory(fin, xCount, yCount);
-	freeMemory(fin1, xCount, yCount);
-	freeMemory(F, xCount, yCount);
-	freeMemory(feq, xCount, yCount);
-	freeMemory(feq1, xCount, yCount);
-	freeMemory(density, xCount, xCount);
-	freeMemory(macroVelocityX, xCount, yCount);
-	freeMemory(macroVelocityY, xCount, yCount);
+	freeMemory(fin,  BASIS, xCount);
+	freeMemory(fin1,  BASIS, xCount);
+	freeMemory(F,  BASIS, xCount);
+	freeMemory(feq,  BASIS, xCount);
+	freeMemory(feq1,  BASIS, xCount);
+	freeMemory(density, xCount);
+	freeMemory(macroVelocityX, xCount);
+	freeMemory(macroVelocityY, xCount);
 
 
 	system("PAUSE");

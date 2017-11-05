@@ -1,10 +1,10 @@
 #include "Array.h"
 
 
-double*** createDistributionFunction(int xNum, int yNum)
+double*** createArray(int basisNum, int xNum, int yNum)
 {
-	double*** f = new double**[BASIS];
-	for (int i = 0; i < BASIS; i++)
+	double*** f = new double**[basisNum];
+	for (int i = 0; i < basisNum; i++)
 	{
 		f[i] = new double*[xNum];
 		for (int j = 0; j < xNum; j++)
@@ -14,7 +14,7 @@ double*** createDistributionFunction(int xNum, int yNum)
 
 }
 
-double** createLayer(int xNum, int yNum)
+double** createArray(int xNum, int yNum)
 {
 	double** f = new double*[xNum];
 	for (int i = 0; i < xNum; i++)
@@ -22,18 +22,18 @@ double** createLayer(int xNum, int yNum)
 	return f;
 }
 
-void Copy(double*** dest, double*** source, int xNum, int yNum)
+void Copy(double*** dest, double*** source, int basisNum, int xNum, int yNum)
 {
-	 for(int i = 0; i < BASIS; i++)
+	 for(int i = 0; i < basisNum; i++)
        for(int j = 0; j < xNum; j++)
 		   for(int k = 0; k < yNum; k++)
              dest[i][j][k] = source[i][j][k];
 	   
 }
 
-void freeMemory(double*** arr, int xNum, int yNum)
+void freeMemory(double*** arr, int basisNum, int xNum)
 {
-	for (int i = 0; i < BASIS; i++) {
+	for (int i = 0; i < basisNum; i++) {
 		for (int j = 0; j < xNum; j++) {
 			delete [] arr[i][j];
 		}
@@ -42,7 +42,7 @@ void freeMemory(double*** arr, int xNum, int yNum)
 	delete [] arr;
 }
 
-void freeMemory(double** arr, int xNum, int yNum)
+void freeMemory(double** arr, int xNum)
 {
     for (int i = 0; i < xNum; i++) {
         delete [] arr[i];

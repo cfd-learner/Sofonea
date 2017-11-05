@@ -2,7 +2,7 @@
 
 double** setInitialDensity(int xNum, int yNum)
 {
-	double** den = createLayer(xNum, yNum);
+	double** den = createArray(xNum, yNum);
 	for (int i = 0; i < xNum; i++)
 		for (int j = 0; j < yNum; j++)
 			den[i][j] = 1;
