@@ -17,23 +17,19 @@
 #include "Macrovelocity.h"
 #include "Scheme.h"
 #include "Latticevelocity.h"
+#include "Flow.h"
 
 using namespace std;
 
-void printGrid(double hx, int xNum)
+void printGrid(double* x, int xNum)
 {
-	double *x = new double[xNum];
-    x[0] = 0;
-    for (int i = 1; i < xNum; i++)
-        x[i] = x[i - 1] + hx;
+	
     FILE *Grid = fopen("grid.txt","wt");
 	for (int i = 0; i < xNum; i++)
 	{
 	  fprintf(Grid, "%g \n", x[i]);
 	}
 	fclose(Grid);
-	freeMemory(x);
-
 }
 
 void printUx(double** Ux, double U0, int xNum, int yNum)
@@ -189,10 +185,28 @@ int main(int argc, char *argv[])
 	setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
 	setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
 
-	printGrid(xStep, xCount);
+
+	// вывод в файл
+	double *x = new double[xCount];
+    x[0] = 0;
+    for (int i = 1; i < xCount; i++)
+        x[i] = x[i - 1] + xStep;
+	printGrid(x,  xCount);
 	printUx(macroVelocityX, velocityUpBoundary, xCount, yCount);
 	printUy(macroVelocityY, velocityUpBoundary, xCount, yCount);
 	printDensity(density, xCount, yCount);
+
+	// вычисление функции тока
+	int countIterationPoisson = 100000;
+	double** vortex = createArray(xCount, yCount);
+	double** streamFunction = setInitialStreamFunction(xCount, yCount);
+	normalizeVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+	computeVortex(vortex, macroVelocityX, macroVelocityY, xStep, xCount, yCount);
+	computeStreamFunction(streamFunction, vortex, xStep, countIterationPoisson, xCount, yCount);
+	double minStreamFunc  = findMinimalStreamFunction(streamFunction, xCount, yCount);
+	double* coordMinStreamFunction = findCoordinatesMinStreamFunctions(streamFunction, minStreamFunc, x, xCount, yCount);
+
+
 
 
 	// очищение памяти
@@ -207,7 +221,10 @@ int main(int argc, char *argv[])
 	freeMemory(density, xCount);
 	freeMemory(macroVelocityX, xCount);
 	freeMemory(macroVelocityY, xCount);
-
+	freeMemory(vortex, xCount);
+	freeMemory(streamFunction, xCount);
+	freeMemory(x);
+	freeMemory(coordMinStreamFunction);
 
 	system("PAUSE");
 	return 0;

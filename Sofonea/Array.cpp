@@ -31,6 +31,37 @@ void Copy(double*** dest, double*** source, int basisNum, int xNum, int yNum)
 	   
 }
 
+void Copy(double** dest, double** source, int n, int m)
+{
+	 for(int i = 0; i < n; i++)
+       for(int j = 0; j < m; j++)
+             dest[i][j] = source[i][j];
+	   
+}
+
+void Copy(double* dest, double* source, int n)
+{
+	 for(int i = 0; i < n; i++)
+             dest[i] = source[i];
+	   
+}
+
+
+// поиск минимального элемента
+double BubbleSort(double *a, int n)
+{
+       double t;
+       for (int i = n - 1; i >= 0; i--)
+           for (j = 0; j < i; j++)
+               if (a[j] > a[j+1])
+               {
+                   t = a[j];
+                   a[j] = a[j + 1];
+                   a[j + 1] = t;            
+               }
+       return a[0];
+};
+
 void freeMemory(double*** arr, int basisNum, int xNum)
 {
 	for (int i = 0; i < basisNum; i++) {
