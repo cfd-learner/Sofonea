@@ -20,6 +20,49 @@
 
 using namespace std;
 
+void printGrid(double hx, int xNum)
+{
+	double *x = new double[xNum];
+    x[0] = 0;
+    for (int i = 1; i < xNum; i++)
+        x[i] = x[i - 1] + hx;
+    FILE *Grid = fopen("grid.txt","wt");
+	for (int i = 0; i < xNum; i++)
+	{
+	  fprintf(Grid, "%g \n", x[i]);
+	}
+	fclose(Grid);
+	freeMemory(x);
+
+}
+
+void printUx(double** Ux, double U0, int xNum, int yNum)
+{
+	int half = 0.5 * xNum;
+	FILE *Vel_x = fopen("Ux.txt","wt");
+	for (int i = 0; i < yNum; i++)
+	  fprintf(Vel_x, "%g \n", Ux[half - 1][i] / U0);
+	fclose(Vel_x);
+}
+
+void printUy(double** Uy, double U0, int xNum, int yNum)
+{
+ 	int half = 0.5 * yNum;
+	FILE *Vel_y = fopen("Uy.txt","wt");
+	for (int i = 0; i < xNum; i++)
+	  fprintf(Vel_y, "%g \n", Uy[i][half - 1] / U0);
+	fclose(Vel_y);
+}
+
+void printDensity(double** den, int xNum, int yNum)
+{
+	int half = 0.5 * xNum;
+	FILE *RhoOutput = fopen("rho.txt","wt");
+	for (int i = 0;i < yNum; i++)
+	  fprintf(RhoOutput, "%g \n", den[half - 1][i]);
+	fclose(RhoOutput);
+}
+
 int main(int argc, char *argv[])
 {
 	//что-то вынести в константы
@@ -145,6 +188,12 @@ int main(int argc, char *argv[])
 	computeMacroVelocity(macroVelocityX, macroVelocityY, density, fin, xCount, yCount);
 	setBoundaryCondMacroVelocity(macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
 	setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
+
+	printGrid(xStep, xCount);
+	printUx(macroVelocityX, velocityUpBoundary, xCount, yCount);
+	printUy(macroVelocityY, velocityUpBoundary, xCount, yCount);
+	printDensity(density, xCount, yCount);
+
 
 	// очищение памяти
 	freeMemory(W);
