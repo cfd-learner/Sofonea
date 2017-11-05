@@ -23,7 +23,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 	//что-то вынести в константы
-	int xCount = 150, yCount = 150, timeCount = 8;
+	int xCount = 150, yCount = 150, timeCount = 800000;
 	double timeLength = 400;
 	double xStep, yStep, timeStep;
 	double meanFreeTime, meanFreePath;
@@ -147,9 +147,9 @@ int main(int argc, char *argv[])
 	setBoundaryCondDensity(fin, density, macroVelocityX, macroVelocityY, velocityUpBoundary, xCount, yCount);
 
 	// очищение памяти
-	delete[] W;
-	delete[] basisVx;
-	delete[] basisVy;
+	freeMemory(W);
+	freeMemory(basisVx);
+	freeMemory(basisVy);
 	freeMemory(fin,  BASIS, xCount);
 	freeMemory(fin1,  BASIS, xCount);
 	freeMemory(F,  BASIS, xCount);

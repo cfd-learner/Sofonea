@@ -49,3 +49,13 @@ void freeMemory(double** arr, int xNum)
     }
     delete [] arr;
 }
+
+void freeMemory(double* arr)
+{
+    delete [] arr;
+}
+
+void freeMemory(int* arr)
+{
+    delete [] arr;
+}
